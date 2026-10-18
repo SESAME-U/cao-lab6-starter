@@ -149,7 +149,8 @@ stage_swarm() {
   sleep 2
   HELLO_VERSION=2 docker stack deploy --detach=false -c stack.yml "$TSTACK" >/tmp/stack-update.log 2>&1
   sleep 3
-  kill -INT $hp 2>/dev/null; wait $hp 2>/dev/null
+  # TERM, not INT: a background job of a script ignores SIGINT.
+  kill -TERM $hp 2>/dev/null; wait $hp 2>/dev/null
   local failed; failed=$(grep -c FAILED /tmp/hammer.log)
   check "rolling update to cao-hello:2 with no failed request (failed: $failed)" test "$failed" -eq 0
   check "after the update, every replica answers version 2" \
