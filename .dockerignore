@@ -1,0 +1,13 @@
+# Keep the build context small and free of secrets.
+.git
+.github
+.devcontainer
+.env
+.env.*
+secrets/
+scripts/
+tests/
+hello/
+*.md
+*.yaml
+*.yml

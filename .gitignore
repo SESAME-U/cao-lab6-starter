@@ -1,0 +1,9 @@
+# Your passwords: copy .env.example to .env
+.env
+.env.student
+# Swarm secret files written by make secrets
+secrets/
+
+# Editors and OS
+.vscode/
+.DS_Store

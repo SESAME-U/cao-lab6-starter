@@ -1,0 +1,48 @@
+# Lab 6, Parts D and E: the same application as a Swarm stack.
+# Deploy with:  make stack-up    (docker stack deploy -c stack.yml cao)
+# Swarm ignores build: and depends_on. It adds deploy:, overlay networks
+# and secrets. Swarm does NOT read .env: passwords come from secret files
+# (make secrets), and HELLO_VERSION from the shell (make passes it).
+
+services:
+  hello:
+    image: cao-hello:${HELLO_VERSION:-1}
+    # TODO D1: publish 8090 on the host to port 80
+    # TODO D2: the network frontend
+    # TODO D3: deploy: 3 replicas; update_config: parallelism 1, delay 5s,
+    #          order start-first, failure_action rollback;
+    #          rollback_config: parallelism 1, order start-first
+
+  db:
+    image: mariadb:12.3.3-noble
+    environment:
+      MARIADB_DATABASE: shop
+      MARIADB_USER: shop
+      # TODO D4: MARIADB_ROOT_PASSWORD_FILE and MARIADB_PASSWORD_FILE,
+      #          pointing to /run/secrets/<secret name>
+    # TODO D5: the secrets db_root_password and db_password
+    # TODO D6: the volume db-data, the network backend, the same healthcheck
+    #          as in compose.yaml, and deploy: 1 replica
+
+  shop:
+    image: cao-shop:1.0
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: shop
+      WORDPRESS_DB_USER: shop
+      # TODO D7: WORDPRESS_DB_PASSWORD_FILE pointing to the db_password secret
+    # TODO D8: the secret db_password, port 8080 to 80, the volume
+    #          shop-uploads, the network backend
+    # TODO D9: deploy: 2 replicas; update_config: parallelism 1, order start-first
+
+networks:
+  # TODO D10: two networks, frontend and backend, both with driver overlay
+  frontend: {}
+
+volumes:
+  db-data: {}
+  shop-uploads: {}
+
+secrets:
+  # TODO D11: db_password from the file ./secrets/db_password.txt,
+  #           db_root_password from ./secrets/db_root_password.txt

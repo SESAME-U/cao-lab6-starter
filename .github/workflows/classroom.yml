@@ -1,0 +1,76 @@
+name: Autograding
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  checks: write
+  actions: read
+  contents: read
+
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Compose file
+        id: compose
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: "compose.yaml: services, healthcheck, depends_on, volumes, no password"
+          command: bash tests/run.sh compose
+          timeout: 5
+          max-score: 2
+
+      - name: Compose run
+        id: composerun
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: "Compose: the shop installs and survives down/up"
+          command: bash tests/run.sh compose-run
+          timeout: 20
+          max-score: 2
+
+      - name: Stack file
+        id: stack
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: "stack.yml: replicas, rolling update, secrets, overlay networks"
+          command: bash tests/run.sh stack
+          timeout: 5
+          max-score: 2
+
+      - name: Swarm run
+        id: swarm
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: "Swarm: replicas behind the mesh, secrets, update without errors"
+          command: bash tests/run.sh swarm
+          timeout: 25
+          max-score: 2
+
+      - name: Submission answered
+        id: submission
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: "SUBMISSION.md complete"
+          command: bash scripts/check-submission.sh
+          timeout: 5
+          max-score: 2
+
+      - name: Autograding Reporter
+        uses: classroom-resources/autograding-grading-reporter@v1
+        env:
+          COMPOSE_RESULTS: "${{ steps.compose.outputs.result }}"
+          COMPOSERUN_RESULTS: "${{ steps.composerun.outputs.result }}"
+          STACK_RESULTS: "${{ steps.stack.outputs.result }}"
+          SWARM_RESULTS: "${{ steps.swarm.outputs.result }}"
+          SUBMISSION_RESULTS: "${{ steps.submission.outputs.result }}"
+        with:
+          runners: compose,composerun,stack,swarm,submission

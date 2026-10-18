@@ -1,0 +1,47 @@
+{
+  // Cloud Automation and Orchestration - SESAME University
+  // Shared toolbox used for the whole semester.
+  //
+  // Built on the default Codespaces "universal" image on purpose:
+  // codespaces based on the default image do not count the container
+  // against your monthly storage quota, even with extra features added.
+  "name": "CAO toolbox",
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+
+  "features": {
+    "ghcr.io/devcontainers/features/terraform:1": {
+      "version": "latest",
+      "tflint": "latest"
+    },
+    "ghcr.io/devcontainers/features/azure-cli:1": {},
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+      "minikube": "none"
+    }
+  },
+
+  // 2-core is enough for every lab until Kubernetes (week 10).
+  "hostRequirements": {
+    "cpus": 2
+  },
+
+  // Lab 6: the shop on 8080, the hello service on 8090.
+  "forwardPorts": [8080, 8090],
+
+  "postCreateCommand": "bash scripts/post-create.sh",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "hashicorp.terraform",
+        "redhat.ansible",
+        "redhat.vscode-yaml",
+        "ms-azuretools.vscode-azureresourcegroups",
+        "github.vscode-github-actions"
+      ],
+      "settings": {
+        "files.trimTrailingWhitespace": true,
+        "editor.formatOnSave": true
+      }
+    }
+  }
+}

@@ -1,0 +1,35 @@
+# Lab 6, Part A: your scripts/up.sh of Lab 5, as one declarative file.
+# Compose reads .env next to this file and replaces every ${NAME} with its
+# value: write ${DB_PASSWORD}, never the password itself.
+# Check your work with:  docker compose config   (prints the result)
+name: lab6
+
+services:
+  db:
+    image: mariadb:12.3.3-noble
+    # TODO A1: restart policy unless-stopped
+    # TODO A2: environment: MARIADB_ROOT_PASSWORD, MARIADB_DATABASE,
+    #          MARIADB_USER and MARIADB_PASSWORD, each from a variable of .env
+    # TODO A3: the named volume db-data on /var/lib/mysql
+    # TODO A4: the network backend
+    # TODO A5: a healthcheck:
+    #            test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+    #            interval 5s, timeout 5s, retries 20, start_period 20s
+
+  shop:
+    build: .
+    image: ${SHOP_IMAGE}
+    # TODO A6: restart policy unless-stopped
+    # TODO A7: environment: WORDPRESS_DB_HOST (the service name of the
+    #          database), WORDPRESS_DB_NAME, WORDPRESS_DB_USER,
+    #          WORDPRESS_DB_PASSWORD, from .env
+    # TODO A8: publish ${SHOP_PORT} on the host to port 80 of the container
+    # TODO A9: the named volume shop-uploads on /var/www/html/wp-content/uploads
+    # TODO A10: the network backend
+    # TODO A11: depends_on db, with the condition service_healthy
+
+networks:
+  backend: {}
+
+# TODO A12: replace {} by the two named volumes, db-data and shop-uploads
+volumes: {}
